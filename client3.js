@@ -6,6 +6,10 @@ let checkHash = ""
 let str = ""
 let checkHash_l = 0;
 let found = -1;
+
+let start_time = 0
+let end_time = 0
+
 socket.on("get checkHash", function(data){
     console.log("checkHash is: ",data);
     checkHash = data;
@@ -16,15 +20,22 @@ socket.on("get data", function(data){
     // console.log("str is : ", data);
     str = data;
 
+    start_time = new Date().getTime();
     found = implementSearch(str, checkHash);
+    end_time = new Date().getTime();
+    console.log("time taken: ", end_time - start_time);
     if(found > -1){
         console.log("found");
-        socket.emit("found", {found:found, id:4});
+        socket.emit("found", {found:found, id:2});
     }else{
         console.log("not found");
-        socket.emit("found", {found:found, id:4});
+        socket.emit("found", {found:found, id:2});
     }
 
+});
+
+socket.on("disconnect it", function(){
+    socket.disconnect();
 });
 
 function implementSearch(str, checkHash){

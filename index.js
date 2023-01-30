@@ -5,10 +5,14 @@ var fs = require('fs');
 let connections = [];
 let file = ""
 let arr = [];
-let checkHash = "tatacctcacagcatgttcaccgcccttacaaggagaa";
+let count = 0;
+let start_time = 0;
+let end_time = 0;
+let checkHash = "ccggatttgacgaagtttttcgggggtaaagctacggatgctat";
 function readFile() {
     file = fs.readFileSync('inputHash.txt', 'utf8');
     //divide into 4
+    console.log(file.length);
     let len = file.length;
     let chunk = len / 4;
     let start = 0;
@@ -38,10 +42,16 @@ io.on('connection', function(socket) {
     socket.on('found', function(...args) {
         console.log("inside found :",args);
         console.log("client: ", args[0].id, "status: ", args[0].found);
-    });
+        count++;
+        if(count===4){
+            end_time = new Date().getTime();
+            console.log("time taken: ", end_time - start_time);
+        }
+});
     socket.on("connected", function(){
         if(connections.length === 4){
             console.log("all connected");
+            start_time = new Date().getTime();
             for(let i = 0; i < 4; i++){
                 connections[i].emit("get checkHash", checkHash);
                 connections[i].emit("get data", arr[i]);
