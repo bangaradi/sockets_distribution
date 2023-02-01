@@ -1,7 +1,7 @@
 var fs = require('fs');
 
-var file = fs.readFileSync('inputHash.txt', 'utf8');
-var checkHash = "ccggatttgacgaagtttttcgggggtaaagctacggatgctat";
+var file = fs.readFileSync('hash.txt', 'utf8');
+var checkHash = file.substring(39560300, 39560350);
 var checkHash_l = checkHash.length;
 
 let start_time = 0
