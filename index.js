@@ -1,7 +1,10 @@
 var app = require('express')();
-var server = require('http').Server(app);
-var io = require('socket.io')(server);
+// var io = require('socket.io')(server);
+const { Server } = require('socket.io');
 var fs = require('fs');
+var cors = require('cors');
+const http = require('http');
+const server = http.createServer(app);
 let connections = [];
 let file = ""
 let arr = [];
@@ -23,9 +26,18 @@ function readFile() {
         end += chunk;
     }
 }
+
+const io = new Server(server, {
+    cors: {
+        origin: 'http://localhost:3000',
+        methods: ['GET', 'POST'],
+    },
+})
+
 readFile();
 io.on('connection', function(socket) {
     connections.push(socket);
+    console.log("connection: ", socket.id)
     console.log('Connected: %s sockets connected', connections.length);
     socket.on('disconnect', function(data) {
         connections.splice(connections.indexOf(socket), 1);
@@ -61,6 +73,6 @@ io.on('connection', function(socket) {
 });
 
 
-server.listen(3000, function() {
-    console.log('Server listening at port %d', 3000);
+server.listen(3001, function() {
+    console.log('Server listening at port %d', 3001);
 });

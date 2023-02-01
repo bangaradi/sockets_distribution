@@ -1,6 +1,9 @@
 var io = require('socket.io-client');
 var prompt = require('prompt-sync')();
 var socket = io.connect("http://localhost:3000");
+var cors = require('cors');
+
+console.log("client1 connected", typeof(socket));
 
 let checkHash = ""
 let str = ""
