@@ -43,8 +43,7 @@ const io = require("socket.io")(server, {
     cors: {
       origin: "*",
       methods: ["GET", "POST"],
-      allowedHeaders: ["my-custom-header"],
-      credentials: true
+      allowedHeaders: ["Access-Control-Allow-Origin"],
     }
   });
 
@@ -71,6 +70,7 @@ io.on('connection', function(socket) {
         console.log("inside found :",args);
         console.log("client: ", args[0].id, "status: ", args[0].found);
         count++;
+        provider_connections[0].emit("found", {found:args[0].found, id:args[0].id})
         if(count===4){
             end_time = new Date().getTime();
             console.log("time taken: ", end_time - start_time);
