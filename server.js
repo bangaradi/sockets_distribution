@@ -29,14 +29,24 @@ function readFile() {
     }
 }
 
-app.use(cors())
+// app.use(cors())
 
-const io = new Server(server, {
+// const io = new Server(server, {
+//     cors: {
+//         origin: '*',
+//         methods: ['*'],
+//         allowedHeaders: ['*'],
+//     },
+// });
+
+const io = require("socket.io")(server, {
     cors: {
-        origin: '*',
-        methods: ['*'],
-    },
-})
+      origin: "*",
+      methods: ["GET", "POST"],
+      allowedHeaders: ["my-custom-header"],
+      credentials: true
+    }
+  });
 
 readFile();
 checkHash = file.substring(39560300, 39560350);
@@ -105,6 +115,18 @@ io.on('connection', function(socket) {
 
 });
 
+// add cors option on get request
+// app.get('/', cors(), function(req, res) {
+//     res.send("hello");
+// });
+
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    // res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Allow-Methods", "*");
+    res.header("Access-Control-Allow-Headers", "*");
+    next();
+    });
 
 server.listen(3001, function() {
     console.log('Server listening at port %d', 3001);
