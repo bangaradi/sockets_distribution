@@ -69,9 +69,15 @@ io.on('connection', function(socket) {
     socket.on('found', function(...args) {
         console.log("inside found :",args);
         console.log("client: ", args[0].id, "status: ", args[0].found);
+        let id = "";
+        let found = false;
+        if(args[0].found !== -1){
+            id = args[0].id;
+            found = true;
+        }
         count++;
-        provider_connections[0].emit("found", {found:args[0].found, id:args[0].id})
-        if(count===4){
+        if(count===node_connections.length){
+            provider_connections[0].emit("found", {found:found, id:id})
             end_time = new Date().getTime();
             console.log("time taken: ", end_time - start_time);
         }
@@ -102,7 +108,8 @@ io.on('connection', function(socket) {
     // split data into number of nodes and send to each node
     socket.on("split data", function(data){
         console.log("inside split data");
-        let len = data.length;
+        start_time = new Date().getTime();
+        let len = file.length;
         let chunk = len / node_connections.length;
         let start = 0;
         let end = chunk;
