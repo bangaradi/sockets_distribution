@@ -29,10 +29,12 @@ function readFile() {
     }
 }
 
+app.use(cors())
+
 const io = new Server(server, {
     cors: {
-        origin: 'http://localhost:3000',
-        methods: ['GET', 'POST'],
+        origin: '*',
+        methods: ['*'],
     },
 })
 
@@ -104,6 +106,6 @@ io.on('connection', function(socket) {
 });
 
 
-server.listen(3000, function() {
-    console.log('Server listening at port %d', 3000);
+server.listen(3001, function() {
+    console.log('Server listening at port %d', 3001);
 });
