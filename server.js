@@ -55,8 +55,14 @@ io.on('connection', function(socket) {
     console.log("connection: ", socket.id)
     console.log('Connected: %s sockets connected', connections.length);
     socket.on('disconnect', function(data) {
+        if(node_connections.indexOf(socket) !== -1){
+            node_connections.splice(node_connections.indexOf(socket), 1);
+        }
+        if(provider_connections.indexOf(socket) !== -1){
+            provider_connections.splice(provider_connections.indexOf(socket), 1);
+        }
         connections.splice(connections.indexOf(socket), 1);
-        console.log('Disconnected: %s sockets connected', connections.length);
+        console.log('Disconnected: %s sockets connected, %s node connections, %s provider connections', connections.length, node_connections.length, provider_connections.length);
     });
     socket.on('get data', function(data) {
         console.log("inside get data",data);
@@ -73,11 +79,17 @@ io.on('connection', function(socket) {
         let found = false;
         if(args[0].found !== -1){
             id = args[0].id;
-            found = true;
+            found = args[0].found;
         }
         count++;
         if(count===node_connections.length){
-            provider_connections[0].emit("found", {found:found, id:id})
+            // for(providers in provider_connections){
+            //     providers.emit("found", {id: id, found: found});
+            // 
+            count = 0;
+            provider_connections.forEach(provider => {
+                provider.emit("found", {id: id, found: found});
+            });
             end_time = new Date().getTime();
             console.log("time taken: ", end_time - start_time);
         }
@@ -114,7 +126,7 @@ io.on('connection', function(socket) {
         let start = 0;
         let end = chunk;
         for (let i = 0; i < node_connections.length; i++) {
-            node_connections[i].emit("get data", data.substring(start, end));
+            node_connections[i].emit("get data", file.substring(start, end));
             start = end;
             end += chunk;
         }
@@ -135,6 +147,6 @@ app.use(function(req, res, next) {
     next();
     });
 
-server.listen(3001, function() {
-    console.log('Server listening at port %d', 3001);
+server.listen(3002, function() {
+    console.log('Server listening at port %d', 3002);
 });
