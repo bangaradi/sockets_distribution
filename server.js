@@ -17,6 +17,8 @@ let checkHash = "";
 function readFile() {
     file = fs.readFileSync('hash.txt', 'utf8');
     // divide into 4
+    // take last 100000 characters
+    file = file.substring(0, 100000);
     console.log(file.length);
     let len = file.length;
     let chunk = len / 4;
@@ -48,7 +50,7 @@ const io = require("socket.io")(server, {
   });
 
 readFile();
-checkHash = file.substring(39560300, 39560350);
+checkHash = file.substring(90850, 90900);
 console.log("checkHash: ", checkHash);
 io.on('connection', function(socket) {
     connections.push(socket);
