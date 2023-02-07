@@ -90,7 +90,7 @@ io.on('connection', function(socket) {
             // 
             count = 0;
             provider_connections.forEach(provider => {
-                provider.emit("found", {id: id, found: found});
+                provider.socket.emit("found", {id: id, found: found});
             });
             end_time = new Date().getTime();
             console.log("time taken: ", end_time - start_time);
@@ -102,21 +102,37 @@ io.on('connection', function(socket) {
             start_time = new Date().getTime();
             for(let i = 0; i < 4; i++){
                 connections[i].emit("get checkHash", checkHash);
-                connections[i].emit("get data", arr[i]);
+                connections[i].emit("get data", {string:arr[i], project:{}});
             }
         }
     });
 
     socket.on("join node", function(){
-        node_connections.push(socket);
+        // check if socket already exists
+        let index = node_connections.findIndex(node => node.id === socket.id);
+        if(index !== -1){
+            return;
+        }
+        else{
+            node_connections.push(socket);
+        }
         console.log("node connected: ", socket.id);
         console.log("node connected: ", node_connections.length);
     });
 
-    socket.on("join provider", function(){
-        provider_connections.push(socket);
+    socket.on("join provider", function(project){
+        //check if socket already exists
+        let index = provider_connections.findIndex(provider => provider.socket.id === socket.id);
+        if(index !== -1){
+            provider_connections[index].project = project;
+            return;
+        }
+        else{
+            provider_connections.push({socket:socket, project:project});
+        }
         console.log("provider connected: ", socket.id);
         console.log("provider connected: ", provider_connections.length);
+        console.log("project: ", project);
     });
 
     // split data into number of nodes and send to each node
@@ -128,7 +144,7 @@ io.on('connection', function(socket) {
         let start = 0;
         let end = chunk;
         for (let i = 0; i < node_connections.length; i++) {
-            node_connections[i].emit("get data", file.substring(start, end));
+            node_connections[i].emit("get data", {string:file.substring(start, end), project:data.project});
             start = end;
             end += chunk;
         }
