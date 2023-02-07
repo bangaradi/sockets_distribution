@@ -10,6 +10,7 @@ let node_connections = [];
 let provider_connections = [];
 let file = ""
 let arr = [];
+let nodeData = [];
 let count = 0;
 let start_time = 0;
 let end_time = 0;
@@ -79,6 +80,9 @@ io.on('connection', function(socket) {
         console.log("client: ", args[0].id, "status: ", args[0].found);
         let id = "";
         let found = false;
+        provider_connections.forEach(provider => {
+            provider.socket.emit("node data", {client: args[0].id, status: args[0].found});
+        });
         if(args[0].found !== -1){
             id = args[0].id;
             found = args[0].found;
