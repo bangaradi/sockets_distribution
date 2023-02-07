@@ -81,7 +81,7 @@ io.on('connection', function(socket) {
         let id = "";
         let found = false;
         provider_connections.forEach(provider => {
-            provider.socket.emit("node data", {client: args[0].id, status: args[0].found});
+            provider.socket.emit("nodedata", {client: args[0].id, status: args[0].found});
         });
         if(args[0].found !== -1){
             id = args[0].id;
