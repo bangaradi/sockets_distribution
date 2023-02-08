@@ -10,10 +10,23 @@ let node_connections = [];
 let provider_connections = [];
 let file = ""
 let arr = [];
+let listToPermute = []
 let count = 0;
 let start_time = 0;
 let end_time = 0;
 let checkHash = "";
+let permutations = 0;
+
+// read from list.txt and fill the listToPermute array
+function readStrings() {
+    let file = fs.readFileSync('list.txt', 'utf8');
+    file = file.split(" ");
+    file.forEach(str => {
+        listToPermute.push(str);
+    });
+}
+readStrings();
+
 function readFile() {
     file = fs.readFileSync('hash.txt', 'utf8');
     // divide into 4
@@ -76,13 +89,14 @@ io.on('connection', function (socket) {
     });
     socket.on('found', function (...args) {
         console.log("inside found :", args);
-        console.log("client: ", args[0].id, "status: ", args[0].found);
+        console.log("client: ", args[0].id, "status: ", args[0].permutations);
         let id = "";
         let found = false;
-        if (args[0].found !== -1) {
-            id = args[0].id;
-            found = args[0].found;
-        }
+        permutations += args[0].permutations;
+        // if (args[0].found !== -1) {
+        //     id = args[0].id;
+        //     found = args[0].permutations;
+        // }
         count++;
         if (count === node_connections.length) {
             // for(providers in provider_connections){
@@ -90,8 +104,9 @@ io.on('connection', function (socket) {
             // 
             count = 0;
             provider_connections.forEach(provider => {
-                provider.socket.emit("found", { id: id, found: found });
+                provider.socket.emit("found", { id: id, permutations: permutations });
             });
+            permutations = 0;
             end_time = new Date().getTime();
             console.log("time taken: ", end_time - start_time);
         }
@@ -143,16 +158,35 @@ io.on('connection', function (socket) {
     // split data into number of nodes and send to each node
     socket.on("split data", function (data) {
         console.log("inside split data");
+        console.log(data);
         start_time = new Date().getTime();
-        let len = file.length;
+        // readStrings(data.listToPermute);
+        // let len = file.length;
+        // let chunk = len / node_connections.length;
+        // let start = 0;
+        // let end = chunk;
+        //split listToPermute into number of nodes
+        let arr = [];
+        let len = listToPermute.length;
         let chunk = len / node_connections.length;
         let start = 0;
         let end = chunk;
         for (let i = 0; i < node_connections.length; i++) {
-            node_connections[i].emit("get data", { string: file.substring(start, end), project: data.project });
+            arr.push(listToPermute.slice(start, end));
             start = end;
             end += chunk;
         }
+        console.log("arr: ", arr);
+        //send data to each node
+        for (let i = 0; i < node_connections.length; i++) {
+            node_connections[i].emit("get data", { listToPermute: arr[i], project: data.project });
+        }
+
+        // for (let i = 0; i < node_connections.length; i++) {
+        //     node_connections[i].emit("get data", { string: file.substring(start, end), project: data.project });
+        //     start = end;
+        //     end += chunk;
+        // }
     });
 
 });
