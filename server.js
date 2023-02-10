@@ -176,7 +176,10 @@ io.on('connection', function (socket) {
             start = end;
             end += chunk;
         }
-        console.log("arr: ", arr);
+        for(let i=0; i<node_connections.length; i++){
+            console.log("arr[i]: ", arr[i]);
+        }
+        // console.log("arr: ", arr);
         //send data to each node
         for (let i = 0; i < node_connections.length; i++) {
             node_connections[i].emit("get data", { listToPermute: arr[i], project: data.project });
