@@ -177,7 +177,7 @@ io.on('connection', function (socket) {
             end += chunk;
         }
         for(let i=0; i<node_connections.length; i++){
-            console.log("arr[i]: ", arr[i]);
+            console.log("arr[",i ,"]: ", arr[i]);
         }
         // console.log("arr: ", arr);
         //send data to each node
